@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>设备信息 · 指纹面板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9ecf5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 20px;
+        }
+
+        .device-card {
+            max-width: 880px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: #ffffffec;
+            box-shadow: 0 20px 40px -8px rgba(18, 25, 45, 0.12), 0 8px 16px -6px rgba(0, 0, 0, 0.05);
+            border-radius: 36px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 28px 30px 34px;
+            transition: all 0.2s ease;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            border-bottom: 2px solid rgba(75, 95, 145, 0.12);
+            padding-bottom: 18px;
+        }
+
+        .header-icon {
+            font-size: 30px;
+            line-height: 1;
+        }
+
+        .header h1 {
+            font-weight: 620;
+            font-size: 1.9rem;
+            letter-spacing: -0.02em;
+            color: #1a2639;
+            margin: 0;
+        }
+
+        .header .badge {
+            margin-left: auto;
+            background: #1e2b3f;
+            color: #d9e2ef;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            background: rgba(22, 34, 55, 0.08);
+            color: #1f2a41;
+            border: 1px solid #cdd6e4;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px 20px;
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            background: #ffffffd6;
+            border-radius: 22px;
+            padding: 14px 18px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: inset 0 1px 3px #ffffff, 0 4px 8px -4px rgba(0, 10, 30, 0.08);
+            border: 1px solid #ffffff;
+            transition: transform 0.1s;
+        }
+
+        .info-item:hover {
+            background: #ffffff;
+            border-color: #cbd5e3;
+        }
+
+        .label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4a5b7c;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .value {
+            font-weight: 580;
+            font-size: 1.1rem;
+            color: #0b1a2b;
+            word-break: break-word;
+            line-height: 1.4;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Consolas', monospace;
+            background: #fafcff;
+            padding: 4px 0;
+            border-radius: 12px;
+        }
+
+        .value.small-mono {
+            font-size: 0.95rem;
+        }
+
+        .canvas-section {
+            margin-top: 12px;
+            background: #1e293b0c;
+            border-radius: 24px;
+            padding: 18px 20px;
+            border: 1px dashed #9aabc0;
+        }
+
+        .fingerprint-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 8px 24px;
+        }
+
+        .fingerprint-row .label {
+            min-width: 100px;
+            font-size: 0.8rem;
+            margin-bottom: 0;
+        }
+
+        .canvas-hash {
+            font-family: 'SF Mono', 'Menlo', monospace;
+            background: #0f172a12;
+            padding: 8px 14px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            color: #143650;
+            word-break: break-all;
+            backdrop-filter: blur(2px);
+            border: 1px solid #ced8e6;
+        }
+
+        .note-line {
+            color: #436684;
+            font-size: 0.85rem;
+            margin-top: 14px;
+            padding-left: 8px;
+            opacity: 0.8;
+        }
+
+        .refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            border: 1.5px solid #bfcfe0;
+            color: #1f344b;
+            font-weight: 550;
+            padding: 12px 24px;
+            border-radius: 48px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            margin-top: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .refresh-btn:hover {
+            background: #eef3fe;
+            border-color: #7c95b3;
+            box-shadow: 0 6px 12px -6px #334e6e33;
+            transform: scale(1.01);
+        }
+
+        .footer-note {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .error-message {
+            color: #b13e3e;
+            background: #ffe8e8;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        /* 加载占位 */
+        .placeholder-glow {
+            color: #6f85a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="device-card">
+        <div class="header">
+            <span class="header-icon">🖥️📱</span>
+            <h1>设备指纹 · 信息</h1>
+            <span class="badge" id="liveBadge">实时采集</span>
+        </div>
+
+        <!-- 主要信息网格 —— 动态绑定展示 -->
+        <div class="info-grid" id="infoGrid">
+            <!-- 通过js动态填充，保证结构统一 -->
+        </div>
+
+        <!-- 高级指纹区域： canvas / webgl -->
+        <div class="canvas-section">
+            <div class="fingerprint-row">
+                <span class="label">🎨 Canvas 指纹</span>
+                <span class="canvas-hash" id="canvasFingerprint">计算中...</span>
+            </div>
+            <div class="fingerprint-row" style="margin-top: 14px;">
+                <span class="label">🧬 WebGL 指纹</span>
+                <span class="canvas-hash" id="webglFingerprint">计算中...</span>
+            </div>
+            <div class="note-line">
+                ⚡ 基于 Canvas / WebGL 渲染器哈希 · 用于增强识别
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <button class="refresh-btn" id="refreshButton">
+                <span>⟳</span> 刷新设备信息
+            </button>
+        </div>
+        <div id="errorMsg" class="error-message" style="display: none; margin-top: 10px;"></div>
+    </div>
+
+    <script>
+        (function(){
+            "use strict";
+
+            // ---------- 辅助函数：从 UA 解析操作系统 ----------
+            function getOSFromUA(userAgent) {
+                const ua = userAgent || '';
+                // 常见规则
+                if (/Windows NT 10.0/.test(ua)) return 'Windows 10 / 11';
+                if (/Windows NT 6.3/.test(ua)) return 'Windows 8.1';
+                if (/Windows NT 6.2/.test(ua)) return 'Windows 8';
+                if (/Windows NT 6.1/.test(ua)) return 'Windows 7';
+                if (/Mac OS X/.test(ua)) {
+                    const match = ua.match(/Mac OS X (\d+[_.]\d+[_.]?\d*)/);
+                    if (match) return 'macOS ' + match[1].replace(/_/g, '.');
+                    return 'macOS';
+                }
+                if (/iPhone|iPad|iPod/.test(ua)) {
+                    const match = ua.match(/OS (\d+_?\d*_?\d*)/);
+                    if (match) return 'iOS ' + match[1].replace(/_/g, '.');
+                    return 'iOS';
+                }
+                if (/Android/.test(ua)) {
+                    const match = ua.match(/Android (\d+\.?\d*\.?\d*)/);
+                    if (match) return 'Android ' + match[1];
+                    return 'Android';
+                }
+                if (/Linux/.test(ua)) return 'Linux';
+                if (/CrOS/.test(ua)) return 'Chrome OS';
+                return '未知系统';
+            }
+
+            // ---------- 高级指纹: 获取 Canvas 哈希 (异步但很快) ----------
+            async function getCanvasFingerprint() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) return 'canvas-unsupported';
+                    
+                    canvas.width = 240;
+                    canvas.height = 60;
+                    
+                    // 绘制混合内容
+                    ctx.textBaseline = 'top';
+                    ctx.font = '14px "Arial", system-ui, sans-serif';
+                    ctx.textBaseline = 'alphabetic';
+                    ctx.fillStyle = '#f5e9d8';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // 渐变 + 文字
+                    const gradient = ctx.createLinearGradient(10, 0, 200, 40);
+                    gradient.addColorStop(0, '#1e5799');
+                    gradient.addColorStop(0.5, '#2989d8');
+                    gradient.addColorStop(1, '#7db9e8');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(4, 4, 200, 28);
+                    
+                    ctx.fillStyle = '#0b1e2e';
+                    ctx.font = 'bold 16px "Segoe UI", "Roboto"';
+                    ctx.fillText('DEVICE•ID', 20, 34);
+                    
+                    ctx.font = '12px "Courier New", monospace';
+                    ctx.fillStyle = '#3d2b1f';
+                    ctx.fillText('屏幕: ' + screen.width + 'x' + screen.height, 18, 50);
+                    
+                    // 额外圆形
+                    ctx.beginPath();
+                    ctx.arc(190, 24, 12, 0, Math.PI * 2);
+                    ctx.fillStyle = '#bc8f8f55';
+                    ctx.fill();
+                    ctx.strokeStyle = '#402b1b';
+                    ctx.lineWidth = 1.2;
+                    ctx.stroke();
+                    
+                    // 获取 dataURL 并快速哈希
+                    const dataURL = canvas.toDataURL();
+                    // 简单哈希: 取子串做展示 (可读性)
+                    let hash = 0;
+                    for (let i = 0; i < dataURL.length; i++) {
+                        const char = dataURL.charCodeAt(i);
+                        hash = ((hash << 5) - hash) + char;
+                        hash |= 0; // 转32位
+                    }
+                    // 转为16进制 + 前缀, 截取部分展示
+                    const hex = (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
+                    return 'canvas:' + hex + '…' + dataURL.slice(-12).replace(/[^a-zA-Z0-9]/g,'');
+                } catch (e) {
+                    console.warn('canvas指纹出错', e);
+                    return '获取失败';
+                }
+            }
+
+            // ---------- WebGL 指纹 (渲染器/厂商信息) ----------
+            function getWebGLFingerprint() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                    if (!gl) return 'webgl-unsupported';
+                    
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    let renderer = 'unknown';
+                    let vendor = 'unknown';
+                    
+                    if (debugInfo) {
+                        renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || '未知渲染器';
+                        vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || '未知厂商';
+                    } else {
+                        // 后备常规参数
+                        renderer = gl.getParameter(gl.RENDERER) || 'no-renderer';
+                        vendor = gl.getParameter(gl.VENDOR) || 'no-vendor';
+                    }
+                    
+                    // 附加一些 webgl 参数: 版本、着色语言版本
+                    const version = gl.getParameter(gl.VERSION);
+                    const shadingLanguageVersion = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
+                    
+                    // 组装成简短视频
+                    const fingerprintStr = `GL:${vendor}|${renderer}|${version}|${shadingLanguageVersion}`;
+                    
+                    // 简单hash展示，但保留可读部分（直接截取）
+                    let simpleHash = 0;
+                    for (let i=0; i<fingerprintStr.length; i++) {
+                        simpleHash = ((simpleHash << 5) - simpleHash) + fingerprintStr.charCodeAt(i);
+                        simpleHash |= 0;
+                    }
+                    const hashPart = (simpleHash >>> 0).toString(16).toUpperCase().slice(0,6);
+                    // 返回可读性较强的摘要
+                    return `webgl:${hashPart} (${renderer.substring(0,24)})`;
+                } catch (e) {
+                    console.warn('webgl指纹错误', e);
+                    return 'webgl-error';
+                }
+            }
+
+            // ---------- 收集所有设备数据 (包括异步 canvas) ----------
+            async function collectDeviceInfo() {
+                // 基本字段 (同步)
+                const screenInfo = `${screen.width}x${screen.height}`;
+                const pixelRatio = window.devicePixelRatio || 1;
+                const colorDepth = screen.colorDepth || 24;
+                const os = getOSFromUA(navigator.userAgent);
+                const platform = navigator.platform || 'unknown';
+                const timezone = (() => {
+                                    const offset = -new Date().getTimezoneOffset() / 60;
+                                    const hours = Math.floor(Math.abs(offset));
+                                    const minutes = (Math.abs(offset) % 1) * 60;
+                                    const sign = offset >= 0 ? '+' : '-';
+                                    return `GMT${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                                })();
+                const language = navigator.language || 'unknown';
+                const userAgent = navigator.userAgent;
+                const hardwareConcurrency = navigator.hardwareConcurrency || 'unknown';
+                const deviceMemory = navigator.deviceMemory || 'unknown';
+
+                // 高级指纹: canvas 异步, webgl 同步
+                let canvasHash = '计算中...';
+                let webglHash = '计算中...';
+                
+                // 先显示一个等待状态，再更新
+                updateUIBasicFields({
+                    screen: screenInfo,
+                    pixelRatio: pixelRatio,
+                    colorDepth: colorDepth,
+                    os: os,
+                    platform: platform,
+                    timezone: timezone,
+                    language: language,
+                    userAgent: userAgent,
+                    hardwareConcurrency: hardwareConcurrency,
+                    deviceMemory: deviceMemory,
+                });
+
+                // 并行获取 canvas / webgl
+                try {
+                    // 由于canvas依赖异步，webgl同步，但为了不阻塞，可以这样：
+                    const canvasPromise = getCanvasFingerprint();
+                    const webglSync = getWebGLFingerprint();
+                    
+                    // 先显示webgl
+                    document.getElementById('webglFingerprint').textContent = webglSync;
+                    
+                    const canvasResult = await canvasPromise;
+                    document.getElementById('canvasFingerprint').textContent = canvasResult;
+                    
+                    // 返回完整对象（可用于日志等）
+                    return {
+                        screen: screenInfo,
+                        pixelRatio,
+                        colorDepth,
+                        os,
+                        platform,
+                        timezone,
+                        language,
+                        userAgent,
+                        hardwareConcurrency,
+                        deviceMemory,
+                        canvas: canvasResult,
+                        webgl: webglSync
+                    };
+                } catch (err) {
+                    document.getElementById('canvasFingerprint').textContent = '获取失败';
+                    document.getElementById('errorMsg').style.display = 'block';
+                    document.getElementById('errorMsg').textContent = '⚠️ 部分指纹获取异常，但不影响基础信息';
+                }
+            }
+
+            // 更新基础网格 (不包含canvas/webgl区域，它们单独展示)
+            function updateUIBasicFields(data) {
+                const grid = document.getElementById('infoGrid');
+                if (!grid) return;
+                
+                // 构建网格项
+                const items = [
+                    { label: '📺 屏幕分辨率', value: data.screen },
+                    { label: '🔍 设备像素比', value: data.pixelRatio },
+                    { label: '🎨 色彩深度', value: data.colorDepth + ' bit' },
+                    { label: '💻 操作系统', value: data.os },
+                    { label: '🖧 平台 (Platform)', value: data.platform },
+                    { label: '🌍 时区', value: data.timezone },
+                    { label: '🗣️ 语言', value: data.language },
+                    { label: '🌐 User Agent', value: data.userAgent, fullWidth: true }  // 可以让UA占两列吗？通过样式处理
+                ];
+
+                // 生成HTML
+                let html = '';
+                items.forEach(item => {
+                    const isUA = item.label.includes('User Agent');
+                    const valueClass = isUA ? 'value small-mono' : 'value';
+                    // 如果是UA，可以让它占据更宽——使用grid-column (但通过内联样式)
+                    const extraStyle = isUA ? 'style="grid-column: span 2;"' : '';
+                    html += `
+                        <div class="info-item" ${extraStyle}>
+                            <div class="label">${item.label}</div>
+                            <div class="${valueClass}">${item.value}</div>
+                        </div>
+                    `;
+                });
+                
+                grid.innerHTML = html;
+            }
+
+            // 刷新所有信息，包括高级指纹
+            async function refreshAllInfo() {
+                const canvasEl = document.getElementById('canvasFingerprint');
+                const webglEl = document.getElementById('webglFingerprint');
+                const errorEl = document.getElementById('errorMsg');
+                
+                canvasEl.textContent = '计算中...';
+                webglEl.textContent = '计算中...';
+                errorEl.style.display = 'none';
+                
+                // 更新基础网格 + 高级指纹
+                await collectDeviceInfo();
+                
+                // 更新小徽章时间戳感觉（可选）
+                const badge = document.getElementById('liveBadge');
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second:'2-digit' });
+                badge.textContent = `更新 ${timeStr}`;
+            }
+
+            // ---------- 初始化页面 ----------
+            window.addEventListener('DOMContentLoaded', async () => {
+                // 初次填充
+                await refreshAllInfo();
+                
+                // 绑定刷新按钮
+                const refreshBtn = document.getElementById('refreshButton');
+                refreshBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    refreshAllInfo();
+                });
+
+                // 添加额外的resilience: 若某些字段缺失
+            });
+
+            // 页面卸载前无需特殊操作
+        })();
+    </script>
+</body>
+</html>
