@@ -434,7 +434,7 @@
                 
                 const html = `
                     <div class="info-item">
-                        <div class="label">📐 屏幕 (pixel)</div>
+                        <div class="label">📐 pixel</div>
                         <div class="value">${escapeHtml(basicData.pixel)}</div>
                     </div>
                     <div class="info-item">
@@ -442,24 +442,16 @@
                         <div class="value">${escapeHtml(String(basicData.pixelRatio))}</div>
                     </div>
                     <div class="info-item">
-                        <div class="label">${osIcon} 系统类型</div>
+                        <div class="label">${osIcon} os</div>
                         <div class="value">${escapeHtml(basicData.os)}</div>
                     </div>
                     <div class="info-item">
-                        <div class="label">🕒 时区</div>
+                        <div class="label">🕒 timezone</div>
                         <div class="value">${escapeHtml(basicData.timezone)}</div>
                     </div>
                     <div class="info-item">
-                        <div class="label">🌐 语言</div>
+                        <div class="label">🌐 language</div>
                         <div class="value">${escapeHtml(basicData.language)}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="label">⚙️ 硬件并发</div>
-                        <div class="value">${hardwareConcurrency !== 'unknown' ? hardwareConcurrency + ' cores' : '不详'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="label">💾 设备内存</div>
-                        <div class="value">${deviceMemory !== 'unknown' ? deviceMemory + ' GB' : '未报告'}</div>
                     </div>
                     <div class="info-item" style="grid-column: span 2;">
                         <div class="label">🌍 User Agent (完整)</div>
